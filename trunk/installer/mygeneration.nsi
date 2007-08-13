@@ -1,5 +1,12 @@
 ;-----------------------------------------
 ; MyGeneration Installation Script
+; This version gets its dll-/exe-files from the 
+;	local build paths below the src directories
+;
+; History
+;	2007-08-12 installer will build with warning instead of fatalerror 
+;				if plugins are not found
+;			Fixed installer for xsd3b plugin
 ;-----------------------------------------
 
 ; Set the compressions to lzma, which is always the best compression!
@@ -82,7 +89,7 @@ SectionEnd
 
 
 ; The stuff to install
-Section "Install Files and Reg Entries"
+Section "-Install Mygeneration and Register Shell Extensions"
 
   ; Set output path to the installation directory.
   SetOutPath $INSTDIR
@@ -109,11 +116,11 @@ Section "Install Files and Reg Entries"
   File /oname=FirebirdSql.Data.Firebird.dll ..\mymeta\ThirdParty\FirebirdSql.Data.Firebird.dll
   File /oname=WeifenLuo.WinFormsUI.Docking.dll ..\mygeneration\MyGeneration\DockManager\WeifenLuo.WinFormsUI.Docking.dll
 
-  File /oname=MyMeta.Plugins.DelimitedText.dll ..\plugins\MyMetaTextFilePlugin\bin\Release\MyMeta.Plugins.DelimitedText.dll
-  File /oname=MyMeta.Plugins.VistaDB3x.dll ..\plugins\MyMetaVistaDB3xPlugin\bin\Release\MyMeta.Plugins.VistaDB3x.dll
-  File /oname=MyMeta.Plugins.SqlCe.dll ..\plugins\MyMetaSqlCePlugin\bin\Release\MyMeta.Plugins.SqlCe.dll
-  File /oname=MyMeta.Plugins.Xsd3b.dll ..\plugins\MyMetaXsd3bPlugin\bin\Release\MyMeta.Plugins.Xsd3b.dll
-
+; Plugins nonfatal means create installer even if the filese do not exist
+  File /nonfatal /oname=MyMeta.Plugins.DelimitedText.dll ..\plugins\MyMetaTextFilePlugin\bin\Release\MyMeta.Plugins.DelimitedText.dll
+  File /nonfatal /oname=MyMeta.Plugins.VistaDB3x.dll ..\plugins\MyMetaVistaDB3xPlugin\bin\Release\MyMeta.Plugins.VistaDB3x.dll
+  File /nonfatal /oname=MyMeta.Plugins.SqlCe.dll ..\plugins\MyMetaSqlCePlugin\bin\Release\MyMeta.Plugins.SqlCe.dll
+  
   Delete $INSTDIR\WeifenLuo.WinFormsUI.dll
   Delete $INSTDIR\VistaDBHelper.dll
  
@@ -453,6 +460,26 @@ Section "Install Files and Reg Entries"
 
   WriteUninstaller "uninstall.exe"
 
+SectionEnd ; end the section
+
+Section "Install Xsd3b Provider for xml (xsd, uml, entityrelationship)"
+  ; Set output path to the installation directory.
+  SetOutPath $INSTDIR
+    
+  File /nonfatal /oname=MyMeta.Plugins.Xsd3b.dll ..\build\Release\MyMeta.Plugins.Xsd3b.dll
+  File /nonfatal ..\plugins\MyMetaXsd3bPlugin\lib\*.dll
+  File /nonfatal ..\plugins\MyMetaXsd3bPlugin\lib\*.xsl
+
+  SetOutPath "$INSTDIR\Templates\Xsd3b"
+  ; CreateDirectory "$INSTDIR\Templates\Xsd3b"
+  
+  ; File /oname=Templates\Xsd3b\ToXsd3b.csgen ..\Templates\Xsd3b\ToXsd3b.csgen
+  ; File /oname=Templates\Xsd3b\ToXsd.csgen ..\Templates\Xsd3b\ToXsd.csgen
+  File ..\Templates\Xsd3b\*.*
+
+  SetOutPath $INSTDIR
+
+  WriteUninstaller "uninstall.exe"
 SectionEnd ; end the section
 
 Section "MSDTC Reset Log (sometimes needed)"
