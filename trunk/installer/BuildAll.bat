@@ -1,6 +1,6 @@
 del ".\build.log"
 
-if "%DEVENV%"=="" set DEVENV=%PROGRAMFILES%\Microsoft Visual Studio 8\Common7\IDE\devenv.exe  /out ".\build.log" /rebuild release
+if "%DEVENV%"=="" set DEVENV="%PROGRAMFILES%\Microsoft Visual Studio 8\Common7\IDE\devenv.exe"  /out ".\build.log" /rebuild release
 
 %DEVENV% "..\mygeneration\Zeus.sln"
 %DEVENV% "..\plugins\MyMetaPlugins.sln"
