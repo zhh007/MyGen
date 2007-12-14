@@ -119,13 +119,15 @@ namespace Zeus.Projects
 				if (_objs == null) 
 				{
 					_objs = new SavedTemplateInputCollection();
+                    _objs.ApplyOverrideDataDelegate = new ApplyOverrideDataDelegate(ApplyRuntimeOverrides);
 				}
 				return _objs;
 			}
 			set 
 			{
 				_objs = value;
-			}
+                _objs.ApplyOverrideDataDelegate = new ApplyOverrideDataDelegate(ApplyRuntimeOverrides);
+            }
 		}
 
 		public ZeusModuleCollection ChildModules 
@@ -196,11 +198,48 @@ namespace Zeus.Projects
                     input[key] = ds[key];
                 }
             }
-		}
+        }
 
-		public void PopulateZeusContext(IZeusContext context) 
-		{
-			FillZeusInputRecursive(this, context.Input);
+        private static void FillZeusInputRuntimeRecursive(ZeusModule module, IZeusInput input, ref bool hasDoneDefSettings)
+        {
+            bool doSettings = false;
+            if (!module.IsParentModule)
+            {
+                FillZeusInputRuntimeRecursive(module.ParentModule, input, ref hasDoneDefSettings);
+            }
+
+            if (!hasDoneDefSettings)
+            {
+                doSettings = module.DefaultSettingsOverride;
+            }
+
+            if (doSettings)
+            {
+                hasDoneDefSettings = true;
+
+                Dictionary<string, string> ds = module.RootProject.GetDefaultSettings();
+
+                foreach (string key in ds.Keys)
+                {
+                    input[key] = ds[key];
+                }
+            }
+
+            foreach (InputItem item in module.UserSavedItems)
+            {
+                input[item.VariableName] = item.DataObject;
+            }
+        }
+
+        public void PopulateZeusContext(IZeusContext context)
+        {
+            FillZeusInputRecursive(this, context.Input);
+        }
+
+        public void ApplyRuntimeOverrides(IZeusInput input)
+        {
+            bool hasDoneDefaults = false;
+            FillZeusInputRuntimeRecursive(this, input, ref hasDoneDefaults);
         }
 
         public void BuildUserXML(XmlTextWriter xml)
