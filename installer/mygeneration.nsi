@@ -1,12 +1,12 @@
 ;-----------------------------------------
 ; MyGeneration Installation Script
 ; This version gets its dll-/exe-files from the 
-;	local build paths below the src directories
+;    local build paths below the src directories
 ;
 ; History
-;	2007-08-12 installer will build with warning instead of fatalerror 
-;				if plugins are not found
-;			Fixed installer for xsd3b plugin
+;    2007-08-12 installer will build with warning instead of fatalerror 
+;                if plugins are not found
+;            Fixed installer for xsd3b plugin
 ;-----------------------------------------
 
 ; Set the compressions to lzma, which is always the best compression!
@@ -51,48 +51,48 @@ Section "Detect .Net Framework 2.0"
     DetailPrint ".Net Framework 2.0 not installed... Aborting Installation."
     Abort
     Goto FrameworkDone
-	SkipFramework:
-		DetailPrint ".Net Framework 2.0 found... Continuing."
-	FrameworkDone:
+    SkipFramework:
+        DetailPrint ".Net Framework 2.0 found... Continuing."
+    FrameworkDone:
 SectionEnd
 
 ; Install MDAC 2.7
 Section "Detect MDAC 2.7+"
 
-	Call GetWindowsVersion
-	Pop $R0
-	StrCmp $R0 "Vista" SkipVistaMDAC
-	
-	Call MDAC27Exists
-	Pop $1
-	IntCmp $1 0 SkipMDAC
-		MessageBox MB_OK|MB_ICONINFORMATION "You cannot run MyGeneration without having MDAC 2.7+ installed. It is not included $\r$\nin the installer because the file is large and most people already have it installed." IDOK
-		ExecShell open http://www.microsoft.com/downloads/details.aspx?FamilyID=6c050fe3-c795-4b7d-b037-185d0506396c&DisplayLang=en
-		DetailPrint "MDAC 2.7+ not installed... Aborting Installation."
-		Abort
-		Goto MDACDone
-	SkipVistaMDAC:
-		DetailPrint "Vista doesn't need MDAC installed... Continuing."
-		Goto MDACDone
-	SkipMDAC:
-		DetailPrint "MDAC 2.7+ found... Continuing."
-	MDACDone:
+    Call GetWindowsVersion
+    Pop $R0
+    StrCmp $R0 "Vista" SkipVistaMDAC
+    
+    Call MDAC27Exists
+    Pop $1
+    IntCmp $1 0 SkipMDAC
+        MessageBox MB_OK|MB_ICONINFORMATION "You cannot run MyGeneration without having MDAC 2.7+ installed. It is not included $\r$\nin the installer because the file is large and most people already have it installed." IDOK
+        ExecShell open http://www.microsoft.com/downloads/details.aspx?FamilyID=6c050fe3-c795-4b7d-b037-185d0506396c&DisplayLang=en
+        DetailPrint "MDAC 2.7+ not installed... Aborting Installation."
+        Abort
+        Goto MDACDone
+    SkipVistaMDAC:
+        DetailPrint "Vista doesn't need MDAC installed... Continuing."
+        Goto MDACDone
+    SkipMDAC:
+        DetailPrint "MDAC 2.7+ found... Continuing."
+    MDACDone:
 SectionEnd
 
 ; Install Microsoft Script Control
 Section "Detect/Install Microsoft Script Control"
-	Call ScriptControlExists
-	Pop $1
-	IntCmp $1 0 SkipMSC
-		GetTempFileName $R1
-		File /oname=$R1 SCT10EN.EXE
-		DetailPrint "Installing the Microsoft Script Control..."
-		ExecWait "$R1 /Q"
-		Delete $R1
-		Goto MSCDone
-	SkipMSC:
-		DetailPrint "Microsoft Script Control found... Skipping install."
-	MSCDone:
+    Call ScriptControlExists
+    Pop $1
+    IntCmp $1 0 SkipMSC
+        GetTempFileName $R1
+        File /oname=$R1 SCT10EN.EXE
+        DetailPrint "Installing the Microsoft Script Control..."
+        ExecWait "$R1 /Q"
+        Delete $R1
+        Goto MSCDone
+    SkipMSC:
+        DetailPrint "Microsoft Script Control found... Skipping install."
+    MSCDone:
 SectionEnd
 
 
@@ -131,6 +131,9 @@ Section "-Install Mygeneration and Register Shell Extensions"
 
   IfFileExists "$INSTDIR\Templates\Other\WinformDemo.vbgen" 0 +2
     Delete "$INSTDIR\Templates\Other\WinformDemo.vbgen"
+    
+  IfFileExists "$INSTDIR\FirebirdSql.Data.Firebird.dll" 0 +2
+    Delete "$INSTDIR\FirebirdSql.Data.Firebird.dll"
   
   ; Get latest DLLs and EXE
   File /oname=ZeusCmd.exe ..\mygeneration\ZeusCmd\bin\Release\ZeusCmd.exe
@@ -146,7 +149,8 @@ Section "-Install Mygeneration and Register Shell Extensions"
   File /oname=CollapsibleSplitter.dll ..\mygeneration\MyGeneration\bin\Release\CollapsibleSplitter.dll
   File /oname=Npgsql.dll ..\mymeta\ThirdParty\Npgsql.dll
   File /oname=Mono.Security.dll ..\mymeta\ThirdParty\Mono.Security.dll
-  File /oname=FirebirdSql.Data.Firebird.dll ..\mymeta\ThirdParty\FirebirdSql.Data.Firebird.dll
+  File /oname=FirebirdSql.Data.FirebirdClient.dll ..\mymeta\ThirdParty\FirebirdSql.Data.FirebirdClient.dll
+  File /oname=MySql.Data.dll ..\mymeta\ThirdParty\MySql.Data.dll
   
   File /oname=ScintillaNET.dll ..\mygeneration\MyGeneration\PluginResources\ScintillaNET.dll
   File /oname=SciLexer.dll ..\mygeneration\MyGeneration\PluginResources\SciLexer.dll
@@ -313,7 +317,7 @@ Section "-Install Mygeneration and Register Shell Extensions"
   File "/oname=Architectures\dOOdads\VB.NET\MyGeneration.dOOdads\My Project\Resources.resx" "..\doodads\VB.NET\MyGeneration.dOOdads\My Project\Resources.resx"
   File "/oname=Architectures\dOOdads\VB.NET\MyGeneration.dOOdads\My Project\Settings.Designer.vb" "..\doodads\VB.NET\MyGeneration.dOOdads\My Project\Settings.Designer.vb"
   File "/oname=Architectures\dOOdads\VB.NET\MyGeneration.dOOdads\My Project\Settings.settings" "..\doodads\VB.NET\MyGeneration.dOOdads\My Project\Settings.settings"
-									
+                                    
   ; CSharp Demo
   File /oname=Architectures\dOOdads\CSharp\dOOdad_Demo\README.TXT ..\doodads\CSharp\dOOdad_Demo\README.TXT
   File /oname=Architectures\dOOdads\CSharp\dOOdad_Demo\App.ico ..\doodads\CSharp\dOOdad_Demo\App.ico
@@ -500,6 +504,13 @@ Section "-Install Mygeneration and Register Shell Extensions"
   WriteRegStr HKCR "ProjectMyGenFile\DefaultIcon" "" $INSTDIR\ZeusProject.ico
   WriteRegStr HKCR "ProjectMyGenFile\shell\open\command" "" '"$INSTDIR\MyGeneration.exe" "%1"'
 
+  ; MyGeneration Development Shell Extensions - ZPRJ
+  WriteRegStr HKCR ".zprjusr" "" "ProjectMyGenFile"
+  WriteRegStr HKCR "ProjectMyGenFile" "" "MyGeneration Project (User) File"
+  ;WriteRegStr HKCR "ProjectMyGenFile\shell" "" "open"
+  WriteRegStr HKCR "ProjectMyGenFile\DefaultIcon" "" $INSTDIR\ZeusProject.ico
+  ;WriteRegStr HKCR "ProjectMyGenFile\shell\open\command" "" '"$INSTDIR\MyGeneration.exe" "%1"'
+  
   WriteUninstaller "uninstall.exe"
 
 SectionEnd ; end the section
@@ -574,8 +585,8 @@ SectionEnd
 ; Launch Program After Install with messagebox
 Section
   MessageBox MB_YESNO|MB_ICONQUESTION "Launch MyGeneration?" IDNO DontLaunchThingy
-  	ExecShell open "$INSTDIR\MyGeneration.exe" SW_SHOWNORMAL
-  	Quit
+      ExecShell open "$INSTDIR\MyGeneration.exe" SW_SHOWNORMAL
+      Quit
   DontLaunchThingy:
 SectionEnd
 
@@ -588,7 +599,7 @@ UninstallIcon ".\modern-uninstall.ico"
 Section "Uninstall"
     
   IfFileExists "$INSTDIR\MyMeta.dll" 0 +2
-	ExecWait `"$WINDIR\Microsoft.NET\Framework\v2.0.50727\regasm.exe" /u "$INSTDIR\MyMeta.dll" /tlb:MyMeta.tlb`
+    ExecWait `"$WINDIR\Microsoft.NET\Framework\v2.0.50727\regasm.exe" /u "$INSTDIR\MyMeta.dll" /tlb:MyMeta.tlb`
   
   ; remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MyGeneration13"
@@ -658,63 +669,63 @@ FunctionEnd
 ; detects Microsoft .Net Framework 2.0
 Function DotNet20Exists
 
-	ClearErrors
-	ReadRegStr $1 HKLM "SOFTWARE\Microsoft\.NETFramework\policy\v2.0" "50727"
-	IfErrors MDNFNotFound MDNFFound
+    ClearErrors
+    ReadRegStr $1 HKLM "SOFTWARE\Microsoft\.NETFramework\policy\v2.0" "50727"
+    IfErrors MDNFNotFound MDNFFound
 
-	MDNFFound:
-		Push 0
-		Goto ExitFunction
-		
-	MDNFNotFound:
-		Push 1
-		Goto ExitFunction
+    MDNFFound:
+        Push 0
+        Goto ExitFunction
+        
+    MDNFNotFound:
+        Push 1
+        Goto ExitFunction
 
-	ExitFunction:
+    ExitFunction:
 
 FunctionEnd
 
 ; detects MDAC 2.7
 Function MDAC27Exists
 
-	ClearErrors
-	ReadRegStr $1 HKLM "SOFTWARE\Microsoft\DataAccess" "FullInstallVer"
-	IfErrors MDACNotFound MDACFound
+    ClearErrors
+    ReadRegStr $1 HKLM "SOFTWARE\Microsoft\DataAccess" "FullInstallVer"
+    IfErrors MDACNotFound MDACFound
 
-	MDACFound:
-		StrCpy $2 $1 3
+    MDACFound:
+        StrCpy $2 $1 3
 
-		StrCmp $2 "2.7" MDAC27Found
-		StrCmp $2 "2.8" MDAC27Found
-		Goto MDACNotFound
-		
-	MDAC27Found:
-		Push 0
-		Goto ExitFunction
+        StrCmp $2 "2.7" MDAC27Found
+        StrCmp $2 "2.8" MDAC27Found
+        Goto MDACNotFound
+        
+    MDAC27Found:
+        Push 0
+        Goto ExitFunction
 
-	MDACNotFound:
-		Push 1
-		Goto ExitFunction
-	ExitFunction:
+    MDACNotFound:
+        Push 1
+        Goto ExitFunction
+    ExitFunction:
 
 FunctionEnd
 
 ; detects Microsoft Script Control
 Function ScriptControlExists
 
-	ClearErrors
-	ReadRegStr $1 HKLM "SOFTWARE\Classes\CLSID\{0E59F1D5-1FBE-11D0-8FF2-00A0D10038BC}" ""
-	IfErrors MSCNotFound MSCFound
+    ClearErrors
+    ReadRegStr $1 HKLM "SOFTWARE\Classes\CLSID\{0E59F1D5-1FBE-11D0-8FF2-00A0D10038BC}" ""
+    IfErrors MSCNotFound MSCFound
 
-	MSCFound:
-		Push 0
-		Goto ExitFunction
-		
-	MSCNotFound:
-		Push 1
-		Goto ExitFunction
+    MSCFound:
+        Push 0
+        Goto ExitFunction
+        
+    MSCNotFound:
+        Push 1
+        Goto ExitFunction
 
-	ExitFunction:
+    ExitFunction:
 
 FunctionEnd
 
