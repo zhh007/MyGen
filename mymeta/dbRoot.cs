@@ -648,11 +648,13 @@ namespace MyMeta
                     if (this._lastConnectionError != string.Empty) this._lastConnectionError += Environment.NewLine;
                     this._lastConnectionError += ex;
                 }
+                return false;
             }
             catch (Exception ex)
             {
                 this._lastConnectionException = ex;
                 this._lastConnectionError = ex.Message;
+                return false;
             }
 
 			_isConnected = true;
